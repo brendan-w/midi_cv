@@ -6,6 +6,7 @@
 const int LTC_CS = 10;
 const int MCP_CS = 9;
 const int MCP_LDAC = 8;
+const int GATE = 7;
 const Array<int, 4> CHANNEL_SELECTOR_SWITCH_PINS({A0, A1, A2, A3});
 
 // SPI protocol for the daisy-chained LTC1655IN8 and MCP4812 DACs. They each have 16-bit shift
@@ -101,9 +102,11 @@ void setup() {
     pinMode(LTC_CS, OUTPUT);
     pinMode(MCP_CS, OUTPUT);
     pinMode(MCP_LDAC, OUTPUT);
+    pinMode(GATE, OUTPUT);
     digitalWrite(LTC_CS, HIGH);
     digitalWrite(MCP_CS, HIGH);
     digitalWrite(MCP_LDAC, HIGH);
+    digitalWrite(GATE, LOW);
     for (int pin : CHANNEL_SELECTOR_SWITCH_PINS) {
         pinMode(pin, INPUT_PULLUP);
     }
@@ -117,10 +120,11 @@ uint16_t mcp_value = 0;
 
 void loop() {
     update_dacs(ltc_value, mcp_value, mcp_value);
-    delay(2);
+    delay(10);
     ltc_value+=128;
     mcp_value+=2;
     if (mcp_value == 1024) {
       mcp_value = 0;
     }
+    digitalWrite(GATE, (mcp_value % 4 == 0) ? HIGH : LOW);
 }
