@@ -3,7 +3,9 @@
 
 #include "src/Array/src/Array.h"  // https://github.com/janelia-arduino/Array because I miss the STL too much
 
-const int MCP_LDAC = 9;
+const int LTC_CS = 10;
+const int MCP_CS = 9;
+const int MCP_LDAC = 8;
 const Array<int, 4> CHANNEL_SELECTOR_SWITCH_PINS({A0, A1, A2, A3});
 
 // SPI protocol for the daisy-chained LTC1655IN8 and MCP4812 DACs. They each have 16-bit shift
@@ -66,18 +68,22 @@ void update_dacs(uint16_t ltc, uint16_t mcp_a, uint16_t mcp_b) {
     };
 
     // Slow down the SPI clock to <= 500khz
-    SPISettings settings(500000, MSBFIRST, SPI_MODE0);
+    SPISettings settings(2500000, MSBFIRST, SPI_MODE0);
     SPI.beginTransaction(settings); // Configures SPI and disables interrupts
 
-    digitalWrite(SS, LOW);
-    SPI.transfer16(command_a.value);
+    digitalWrite(LTC_CS, LOW);
     SPI.transfer16(ltc);
-    digitalWrite(SS, HIGH);
+    digitalWrite(LTC_CS, HIGH);
+
     // digitalWrite() is slow enough that its actually been 5usec since we set it high
-    digitalWrite(SS, LOW);
+
+    digitalWrite(MCP_CS, LOW);
+    SPI.transfer16(command_a.value);
+    digitalWrite(MCP_CS, HIGH);
+
+    digitalWrite(MCP_CS, LOW);
     SPI.transfer16(command_b.value);
-    SPI.transfer16(ltc);
-    digitalWrite(SS, HIGH);
+    digitalWrite(MCP_CS, HIGH);
 
     // Trigger the MCP to load/output the new value
     digitalWrite(MCP_LDAC, LOW);
@@ -92,9 +98,11 @@ void update_dacs(uint16_t ltc, uint16_t mcp_a, uint16_t mcp_b) {
 
 
 void setup() {
-    pinMode(SS, OUTPUT);
+    pinMode(LTC_CS, OUTPUT);
+    pinMode(MCP_CS, OUTPUT);
     pinMode(MCP_LDAC, OUTPUT);
-    digitalWrite(SS, HIGH);
+    digitalWrite(LTC_CS, HIGH);
+    digitalWrite(MCP_CS, HIGH);
     digitalWrite(MCP_LDAC, HIGH);
     for (int pin : CHANNEL_SELECTOR_SWITCH_PINS) {
         pinMode(pin, INPUT_PULLUP);
@@ -108,8 +116,8 @@ uint16_t mcp_value = 0;
 // uint16_t mcp_b_value = 0;
 
 void loop() {
-    update_dacs(0, 0, mcp_value);
-    delay(10);
+    update_dacs(ltc_value, mcp_value, mcp_value);
+    delay(2);
     ltc_value+=128;
     mcp_value+=2;
     if (mcp_value == 1024) {
