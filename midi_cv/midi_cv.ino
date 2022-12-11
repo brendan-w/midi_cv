@@ -16,23 +16,23 @@ union MCP4812Command {
     struct Fields {
         // Command for the MCP4812
         // ----------------------------------
-        uint8_t mcp_ab_select:1;
-        static constexpr uint8_t MCP_DAC_A = 0;
-        static constexpr uint8_t MCP_DAC_B = 1;
+        uint8_t __:2;  // unused
 
-        uint8_t _:1;  // unused
-
-        uint8_t mcp_gain_select:1;
-        static constexpr uint8_t MCP_GAIN_2X = 0;
-        static constexpr uint8_t MCP_GAIN_1X = 1;
+        uint16_t mcp_value:10;
 
         uint8_t mcp_output_shutdown:1;
         static constexpr uint8_t MCP_OUTPUT_ACTIVE = 1;
         static constexpr uint8_t MCP_OUTPUT_SHUTDOWN = 0;
 
-        uint16_t mcp_value:10;
+        uint8_t mcp_gain_select:1;
+        static constexpr uint8_t MCP_GAIN_2X = 0;
+        static constexpr uint8_t MCP_GAIN_1X = 1;
 
-        uint8_t __:2;  // unused
+        uint8_t _:1;  // unused
+
+        uint8_t mcp_ab_select:1;
+        static constexpr uint8_t MCP_DAC_A = 0;
+        static constexpr uint8_t MCP_DAC_B = 1;
     } __attribute__((packed)) fields;
     uint16_t value;
 };
@@ -49,19 +49,19 @@ void update_dacs(uint16_t ltc, uint16_t mcp_a, uint16_t mcp_b) {
     // so we prepare two of them rather than re-using one.
     MCP4812Command command_a = {
         fields: {
-            mcp_ab_select: MCP4812Command::Fields::MCP_DAC_A,
-            mcp_gain_select: MCP4812Command::Fields::MCP_GAIN_2X,
-            mcp_output_shutdown: MCP4812Command::Fields::MCP_OUTPUT_ACTIVE,
             mcp_value: mcp_a,
+            mcp_output_shutdown: MCP4812Command::Fields::MCP_OUTPUT_ACTIVE,
+            mcp_gain_select: MCP4812Command::Fields::MCP_GAIN_2X,
+            mcp_ab_select: MCP4812Command::Fields::MCP_DAC_A,
         }
     };
 
     MCP4812Command command_b = {
         fields: {
-            mcp_ab_select: MCP4812Command::Fields::MCP_DAC_B,
-            mcp_gain_select: MCP4812Command::Fields::MCP_GAIN_2X,
-            mcp_output_shutdown: MCP4812Command::Fields::MCP_OUTPUT_ACTIVE,
             mcp_value: mcp_b,
+            mcp_output_shutdown: MCP4812Command::Fields::MCP_OUTPUT_ACTIVE,
+            mcp_gain_select: MCP4812Command::Fields::MCP_GAIN_2X,
+            mcp_ab_select: MCP4812Command::Fields::MCP_DAC_B,
         }
     };
 
@@ -104,11 +104,15 @@ void setup() {
 }
 
 uint16_t ltc_value = 0;
-// uint16_t mcp_a_value = 0;
+uint16_t mcp_value = 0;
 // uint16_t mcp_b_value = 0;
 
 void loop() {
-    update_dacs(ltc_value, 0, 0);
-    delay(100);
-    ltc_value++;
+    update_dacs(0, 0, mcp_value);
+    delay(10);
+    ltc_value+=128;
+    mcp_value+=2;
+    if (mcp_value == 1024) {
+      mcp_value = 0;
+    }
 }
