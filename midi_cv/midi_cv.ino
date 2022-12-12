@@ -2,6 +2,10 @@
 #include <SPI.h>
 
 #include "src/Array/src/Array.h"  // https://github.com/janelia-arduino/Array because I miss the STL too much
+#include "src/arduino_midi_library/src/MIDI.h"  // https://github.com/FortySevenEffects/arduino_midi_library
+
+// Default instance is bound to the HW serial port
+MIDI_CREATE_DEFAULT_INSTANCE();
 
 const int LTC_CS = 10;
 const int MCP_CS = 9;
