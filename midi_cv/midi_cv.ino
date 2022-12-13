@@ -7,22 +7,21 @@
 // Default instance is bound to the HW serial port
 MIDI_CREATE_DEFAULT_INSTANCE();
 
+// CONSTANTS
 const int LTC_CS = 10;
 const int MCP_CS = 9;
 const int MCP_LDAC = 8;
-const int GATE = 7;
-const Array<int, 4> CHANNEL_SELECTOR_SWITCH_PINS({A0, A1, A2, A3});
+const int GATE = 3;
+const int MIDI_ACTIVITY = 2;
+const Array<int, 4> CHANNEL_SELECTOR_SWITCH_PINS({4, 5, 6, 7});  // in binary order: 1, 2, 4, 8
 
-// SPI protocol for the daisy-chained LTC1655IN8 and MCP4812 DACs. They each have 16-bit shift
-// registers, so this struct contains back-to-back commands to fill out the total 32 bits of
-// configuration. The MCP4812 command is placed first in the struct, because it is at the end
-// of the shift register chain. Note that the MCP4812 can also only update one channel at a time,
-// so it takes two of these commands to update all three outputs. This is slightly inefficient
-// (we're updating the LTC twice), but not noticable when running at >= 1MHz baudrates.
+// STATE
+byte midi_channel = 1;  // 1-16
+
+// SPI protocol for the MCP4812 DAC. It has a 16-bit shift register that can update one of the two
+// outputs at a time, so updating both DACs takes two commands. Note that the members of this struct are upside-down compared to the datasheet. This is because the 
 union MCP4812Command {
     struct Fields {
-        // Command for the MCP4812
-        // ----------------------------------
         uint8_t __:2;  // unused
 
         uint16_t mcp_value:10;
@@ -90,32 +89,67 @@ void update_dacs(uint16_t ltc, uint16_t mcp_a, uint16_t mcp_b) {
     SPI.transfer16(command_b.value);
     digitalWrite(MCP_CS, HIGH);
 
-    // Trigger the MCP to load/output the new value
+    // Trigger the MCP to load the new value and update its outputs
     digitalWrite(MCP_LDAC, LOW);
     digitalWrite(MCP_LDAC, HIGH);
 
     SPI.endTransaction(); // re-enables interrupts
 }
 
+byte read_16_switch(const Array<int, 4> &pins) {
+    byte value = 0;
+    for (int i = 0; i < pins.size(); i++) {
+        // LOW/HIGH are technically #defines, and so value is uncertain.
+        // Convert to 0/1 and invert, since LOW means active in our circuit.
+        byte pin_value = digitalRead(pins[i]) == HIGH ? 0 : 1;
+        value |= (pin_value << i);
+    }
+    return value;
+}
 
+void handleNoteOn(byte channel, byte pitch, byte velocity)
+{
+    // Do whatever you want when a note is pressed.
 
+    // Try to keep your callbacks short (no delays ect)
+    // otherwise it would slow down the loop() and have a bad impact
+    // on real-time performance.
+    digitalWrite(MIDI_ACTIVITY, HIGH);
+    delay(5);
+    digitalWrite(MIDI_ACTIVITY, LOW);
+}
 
-
+void handleNoteOff(byte channel, byte pitch, byte velocity)
+{
+    digitalWrite(MIDI_ACTIVITY, HIGH);
+    delay(5);
+    digitalWrite(MIDI_ACTIVITY, LOW);
+}
 
 void setup() {
     pinMode(LTC_CS, OUTPUT);
     pinMode(MCP_CS, OUTPUT);
     pinMode(MCP_LDAC, OUTPUT);
     pinMode(GATE, OUTPUT);
+    pinMode(MIDI_ACTIVITY, OUTPUT);
     digitalWrite(LTC_CS, HIGH);
     digitalWrite(MCP_CS, HIGH);
     digitalWrite(MCP_LDAC, HIGH);
     digitalWrite(GATE, LOW);
+    digitalWrite(MIDI_ACTIVITY, LOW);
+
+    // MIDI channel selector
     for (int pin : CHANNEL_SELECTOR_SWITCH_PINS) {
         pinMode(pin, INPUT_PULLUP);
     }
+    midi_channel = read_16_switch(CHANNEL_SELECTOR_SWITCH_PINS) + 1;
 
+    // Start main IO
     SPI.begin();
+
+    MIDI.setHandleNoteOn(handleNoteOn);
+    MIDI.setHandleNoteOff(handleNoteOff);
+    MIDI.begin(MIDI_CHANNEL_OMNI);
 }
 
 uint16_t ltc_value = 0;
@@ -131,4 +165,5 @@ void loop() {
       mcp_value = 0;
     }
     digitalWrite(GATE, (mcp_value % 4 == 0) ? HIGH : LOW);
+    MIDI.read();
 }

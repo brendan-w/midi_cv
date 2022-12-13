@@ -557,7 +557,7 @@ Wire Wire Line
 Wire Wire Line
 	4750 3400 5300 3400
 Wire Wire Line
-	4650 2350 4650 5800
+	4650 2750 4650 5800
 Wire Wire Line
 	4650 5800 7400 5800
 Wire Wire Line
@@ -806,12 +806,12 @@ $EndComp
 $Comp
 L Connector:Conn_01x06_Male J3
 U 1 1 63D99E2D
-P 4800 7050
-F 0 "J3" H 5000 6650 50  0000 R CNN
-F 1 "Power" H 5000 6550 50  0000 R CNN
-F 2 "" H 4800 7050 50  0001 C CNN
-F 3 "~" H 4800 7050 50  0001 C CNN
-	1    4800 7050
+P 5150 7050
+F 0 "J3" H 5350 6650 50  0000 R CNN
+F 1 "Power" H 5350 6550 50  0000 R CNN
+F 2 "" H 5150 7050 50  0001 C CNN
+F 3 "~" H 5150 7050 50  0001 C CNN
+	1    5150 7050
 	-1   0    0    -1  
 $EndComp
 $Comp
@@ -943,7 +943,7 @@ F 3 "~" H 8500 1800 50  0001 C CNN
 	0    -1   -1   0   
 $EndComp
 Wire Wire Line
-	4500 3850 4500 2450
+	4500 3850 4500 2850
 Wire Wire Line
 	4400 3050 4400 4350
 $Comp
@@ -1098,40 +1098,30 @@ Wire Wire Line
 	3800 7450 4250 7450
 Wire Wire Line
 	4250 7450 4250 7250
-Wire Wire Line
-	4250 7250 4600 7250
 Connection ~ 3800 7450
 Wire Wire Line
 	3800 7150 4250 7150
 Wire Wire Line
-	4250 7150 4600 7150
-Connection ~ 3800 6850
-Wire Wire Line
 	4250 7150 4250 6550
 Wire Wire Line
 	4250 6550 3800 6550
-Connection ~ 4250 7150
 Connection ~ 3800 6550
 Wire Wire Line
-	3800 6850 4600 6850
+	4800 7050 4800 6250
 Wire Wire Line
-	4600 7050 4350 7050
-Wire Wire Line
-	4350 7050 4350 6250
-Wire Wire Line
-	4350 6250 3800 6250
+	4800 6250 4650 6250
 Connection ~ 3800 6250
-Text Label 4800 7150 0    50   ~ 0
+Text Label 5150 7150 0    50   ~ 0
 Ground
-Text Label 4800 7250 0    50   ~ 0
+Text Label 5150 7250 0    50   ~ 0
 -15VDC
-Text Label 4800 7350 0    50   ~ 0
+Text Label 5150 7350 0    50   ~ 0
 NC
-Text Label 4800 6850 0    50   ~ 0
+Text Label 5150 6850 0    50   ~ 0
 +15VDC
-Text Label 4800 6950 0    50   ~ 0
+Text Label 5150 6950 0    50   ~ 0
 Key
-Text Label 4800 7050 0    50   ~ 0
+Text Label 5150 7050 0    50   ~ 0
 +5VDC
 Text Notes 2800 850  0    50   ~ 0
 20k pull-up in Arduino
@@ -1163,10 +1153,6 @@ Wire Wire Line
 	4950 2050 4950 2150
 Wire Wire Line
 	4950 2150 5300 2150
-Wire Wire Line
-	4500 2450 3800 2450
-Wire Wire Line
-	4650 2350 3800 2350
 Wire Wire Line
 	4750 2250 3800 2250
 Wire Wire Line
@@ -1246,45 +1232,29 @@ Wire Wire Line
 Wire Wire Line
 	3800 3050 4400 3050
 Wire Wire Line
-	3800 2550 3900 2550
-Wire Wire Line
-	3900 2550 3900 1200
+	3900 2350 3900 1200
 Wire Wire Line
 	3900 1200 2600 1200
 Wire Wire Line
-	2600 1200 2600 1800
+	2600 1200 2600 2100
 Wire Wire Line
-	2600 1800 2050 1800
-Wire Wire Line
-	3800 2650 4000 2650
-Wire Wire Line
-	4000 2650 4000 1100
+	4000 2450 4000 1100
 Wire Wire Line
 	4000 1100 2500 1100
 Wire Wire Line
-	2500 1100 2500 1900
+	2500 1100 2500 2000
 Wire Wire Line
-	2500 1900 2050 1900
-Wire Wire Line
-	3800 2750 4100 2750
-Wire Wire Line
-	4100 2750 4100 1000
+	4100 2550 4100 1000
 Wire Wire Line
 	4100 1000 2400 1000
 Wire Wire Line
-	2400 1000 2400 2000
+	2400 1000 2400 1900
 Wire Wire Line
-	2400 2000 2050 2000
-Wire Wire Line
-	3800 2850 4200 2850
-Wire Wire Line
-	4200 2850 4200 900 
+	4200 2650 4200 900 
 Wire Wire Line
 	4200 900  2300 900 
 Wire Wire Line
-	2300 900  2300 2100
-Wire Wire Line
-	2300 2100 2050 2100
+	2300 900  2300 1800
 Wire Wire Line
 	2050 1700 2150 1700
 Wire Wire Line
@@ -1319,4 +1289,73 @@ Connection ~ 3200 5050
 Connection ~ 1950 5050
 Wire Wire Line
 	1950 5050 1950 5150
+Wire Wire Line
+	4650 2750 3800 2750
+Wire Wire Line
+	4500 2850 3800 2850
+Wire Wire Line
+	4200 2650 3800 2650
+Wire Wire Line
+	4100 2550 3800 2550
+Wire Wire Line
+	4000 2450 3800 2450
+Wire Wire Line
+	3900 2350 3800 2350
+Wire Wire Line
+	2050 2100 2600 2100
+Wire Wire Line
+	2500 2000 2050 2000
+Wire Wire Line
+	2050 1900 2400 1900
+Wire Wire Line
+	2300 1800 2050 1800
+Wire Wire Line
+	3800 6850 4350 6850
+Connection ~ 3800 6850
+Wire Wire Line
+	4250 7150 4950 7150
+Connection ~ 4250 7150
+Wire Wire Line
+	4250 7250 4350 7250
+Wire Wire Line
+	4800 7050 4950 7050
+$Comp
+L Device:D D?
+U 1 1 63AEADE6
+P 4500 6250
+F 0 "D?" H 4350 6500 50  0000 L CNN
+F 1 "1N4007" H 4350 6400 50  0000 L CNN
+F 2 "" H 4500 6250 50  0001 C CNN
+F 3 "~" H 4500 6250 50  0001 C CNN
+	1    4500 6250
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4350 6250 3800 6250
+$Comp
+L Device:D D?
+U 1 1 63B757D2
+P 4500 6850
+F 0 "D?" H 4350 7100 50  0000 L CNN
+F 1 "1N4007" H 4350 7000 50  0000 L CNN
+F 2 "" H 4500 6850 50  0001 C CNN
+F 3 "~" H 4500 6850 50  0001 C CNN
+	1    4500 6850
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4650 6850 4950 6850
+$Comp
+L Device:D D?
+U 1 1 63B7634D
+P 4500 7250
+F 0 "D?" H 4350 7500 50  0000 L CNN
+F 1 "1N4007" H 4350 7400 50  0000 L CNN
+F 2 "" H 4500 7250 50  0001 C CNN
+F 3 "~" H 4500 7250 50  0001 C CNN
+	1    4500 7250
+	-1   0    0    1   
+$EndComp
+Wire Wire Line
+	4650 7250 4950 7250
 $EndSCHEMATC
