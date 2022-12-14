@@ -14,17 +14,6 @@ Comment3 ""
 Comment4 ""
 $EndDescr
 $Comp
-L MCU_Module:Arduino_Nano_v3.x A1
-U 1 1 63842D47
-P 3300 2450
-F 0 "A1" H 3800 3200 50  0000 C CNN
-F 1 "Arduino_Nano_v3.x" H 4100 3300 50  0000 C CNN
-F 2 "Module:Arduino_Nano" H 3300 2450 50  0001 C CIN
-F 3 "http://www.mouser.com/pdfdocs/Gravitech_Arduino_Nano3_0.pdf" H 3300 2450 50  0001 C CNN
-	1    3300 2450
-	-1   0    0    1   
-$EndComp
-$Comp
 L dk_Linear-Amplifiers-Instrumentation-OP-Amps-Buffer-Amps:TL084CN U5
 U 1 1 63843A91
 P 7700 1800
@@ -185,17 +174,6 @@ F 12 "Active" H 9200 3000 60  0001 L CNN "Status"
 	0    -1   -1   0   
 $EndComp
 $Comp
-L power:GND #PWR012
-U 1 1 63864BBE
-P 3300 1450
-F 0 "#PWR012" H 3300 1200 50  0001 C CNN
-F 1 "GND" H 3305 1277 50  0000 C CNN
-F 2 "" H 3300 1450 50  0001 C CNN
-F 3 "" H 3300 1450 50  0001 C CNN
-	1    3300 1450
-	-1   0    0    1   
-$EndComp
-$Comp
 L Analog_DAC:MCP4812 U4
 U 1 1 6386B082
 P 5800 3400
@@ -238,17 +216,6 @@ F 2 "" H 5650 2100 50  0001 C CNN
 F 3 "" H 5650 2100 50  0001 C CNN
 	1    5650 2100
 	1    0    0    -1  
-$EndComp
-$Comp
-L power:+5V #PWR010
-U 1 1 6389B431
-P 3100 3450
-F 0 "#PWR010" H 3100 3300 50  0001 C CNN
-F 1 "+5V" H 3115 3623 50  0000 C CNN
-F 2 "" H 3100 3450 50  0001 C CNN
-F 3 "" H 3100 3450 50  0001 C CNN
-	1    3100 3450
-	-1   0    0    1   
 $EndComp
 $Comp
 L power:+5V #PWR015
@@ -538,14 +505,8 @@ Wire Wire Line
 	7250 5200 7400 5200
 Connection ~ 7400 5200
 Wire Wire Line
-	3800 1750 5050 1750
-Wire Wire Line
 	5050 1750 5050 2050
 Connection ~ 5050 2050
-Wire Wire Line
-	3800 1950 5150 1950
-Wire Wire Line
-	3800 2050 4950 2050
 Wire Wire Line
 	4850 3600 5300 3600
 Wire Wire Line
@@ -692,35 +653,8 @@ F 3 "" H 3950 5550 50  0001 C CNN
 $EndComp
 Wire Wire Line
 	3950 5050 3950 5550
-$Comp
-L Device:R R5
-U 1 1 63C2645B
-P 4150 4350
-F 0 "R5" V 4357 4350 50  0000 C CNN
-F 1 "220" V 4266 4350 50  0000 C CNN
-F 2 "" V 4080 4350 50  0001 C CNN
-F 3 "~" H 4150 4350 50  0001 C CNN
-	1    4150 4350
-	0    -1   -1   0   
-$EndComp
-Connection ~ 4400 4350
-Wire Wire Line
-	4400 4350 4400 4950
-$Comp
-L power:+5V #PWR011
-U 1 1 63C4584F
-P 3900 4350
-F 0 "#PWR011" H 3900 4200 50  0001 C CNN
-F 1 "+5V" H 3915 4523 50  0000 C CNN
-F 2 "" H 3900 4350 50  0001 C CNN
-F 3 "" H 3900 4350 50  0001 C CNN
-	1    3900 4350
-	0    -1   -1   0   
-$EndComp
 Wire Wire Line
 	3950 4950 4400 4950
-Wire Wire Line
-	4300 4350 4400 4350
 Wire Wire Line
 	4150 5250 4150 4750
 Wire Wire Line
@@ -731,67 +665,6 @@ Wire Wire Line
 	2800 4750 2750 4750
 Wire Wire Line
 	2750 4750 2750 4600
-$Comp
-L Device:LED D1
-U 1 1 63CFE04F
-P 2500 3850
-F 0 "D1" H 2493 4067 50  0000 C CNN
-F 1 "MIDI Act LED" H 2493 3976 50  0000 C CNN
-F 2 "" H 2500 3850 50  0001 C CNN
-F 3 "~" H 2500 3850 50  0001 C CNN
-	1    2500 3850
-	1    0    0    -1  
-$EndComp
-$Comp
-L Device:R R3
-U 1 1 63D332C7
-P 2950 3850
-F 0 "R3" V 3157 3850 50  0000 C CNN
-F 1 "220" V 3066 3850 50  0000 C CNN
-F 2 "" V 2880 3850 50  0001 C CNN
-F 3 "~" H 2950 3850 50  0001 C CNN
-	1    2950 3850
-	0    -1   -1   0   
-$EndComp
-Wire Wire Line
-	2650 3850 2800 3850
-Wire Wire Line
-	3100 3850 4500 3850
-$Comp
-L power:GND #PWR04
-U 1 1 63D3A9A1
-P 2200 3850
-F 0 "#PWR04" H 2200 3600 50  0001 C CNN
-F 1 "GND" H 2205 3677 50  0000 C CNN
-F 2 "" H 2200 3850 50  0001 C CNN
-F 3 "" H 2200 3850 50  0001 C CNN
-	1    2200 3850
-	0    1    1    0   
-$EndComp
-Wire Wire Line
-	2200 3850 2350 3850
-$Comp
-L Switch:SW_Coded_SH-7050 SW2
-U 1 1 63D4CF04
-P 1650 1900
-F 0 "SW2" H 1707 2367 50  0000 C CNN
-F 1 "MIDI Channel" H 1707 2276 50  0000 C CNN
-F 2 "" H 1350 1450 50  0001 L CNN
-F 3 "https://www.nidec-copal-electronics.com/e/catalog/switch/sh-7000.pdf" H 1650 1900 50  0001 C CNN
-	1    1650 1900
-	1    0    0    -1  
-$EndComp
-$Comp
-L power:GND #PWR05
-U 1 1 63D66A4B
-P 2150 1600
-F 0 "#PWR05" H 2150 1350 50  0001 C CNN
-F 1 "GND" H 2155 1427 50  0000 C CNN
-F 2 "" H 2150 1600 50  0001 C CNN
-F 3 "" H 2150 1600 50  0001 C CNN
-	1    2150 1600
-	-1   0    0    1   
-$EndComp
 $Comp
 L power:+15V #PWR07
 U 1 1 63DBF612
@@ -944,8 +817,6 @@ F 3 "~" H 8500 1800 50  0001 C CNN
 $EndComp
 Wire Wire Line
 	4500 3850 4500 2850
-Wire Wire Line
-	4400 3050 4400 4350
 $Comp
 L power:GND #PWR08
 U 1 1 63DF339E
@@ -1154,10 +1025,6 @@ Wire Wire Line
 Wire Wire Line
 	4950 2150 5300 2150
 Wire Wire Line
-	4750 2250 3800 2250
-Wire Wire Line
-	3800 2150 4850 2150
-Wire Wire Line
 	4850 2150 4850 3600
 Wire Wire Line
 	5150 1950 5150 3500
@@ -1228,38 +1095,6 @@ F 3 "" H 3950 4650 50  0001 C CNN
 	0    1    1    0   
 $EndComp
 Wire Wire Line
-	3900 4350 4000 4350
-Wire Wire Line
-	3800 3050 4400 3050
-Wire Wire Line
-	3900 2350 3900 1200
-Wire Wire Line
-	3900 1200 2600 1200
-Wire Wire Line
-	2600 1200 2600 2100
-Wire Wire Line
-	4000 2450 4000 1100
-Wire Wire Line
-	4000 1100 2500 1100
-Wire Wire Line
-	2500 1100 2500 2000
-Wire Wire Line
-	4100 2550 4100 1000
-Wire Wire Line
-	4100 1000 2400 1000
-Wire Wire Line
-	2400 1000 2400 1900
-Wire Wire Line
-	4200 2650 4200 900 
-Wire Wire Line
-	4200 900  2300 900 
-Wire Wire Line
-	2300 900  2300 1800
-Wire Wire Line
-	2050 1700 2150 1700
-Wire Wire Line
-	2150 1700 2150 1600
-Wire Wire Line
 	1350 5900 2050 5900
 $Comp
 L Device:D D?
@@ -1289,26 +1124,6 @@ Connection ~ 3200 5050
 Connection ~ 1950 5050
 Wire Wire Line
 	1950 5050 1950 5150
-Wire Wire Line
-	4650 2750 3800 2750
-Wire Wire Line
-	4500 2850 3800 2850
-Wire Wire Line
-	4200 2650 3800 2650
-Wire Wire Line
-	4100 2550 3800 2550
-Wire Wire Line
-	4000 2450 3800 2450
-Wire Wire Line
-	3900 2350 3800 2350
-Wire Wire Line
-	2050 2100 2600 2100
-Wire Wire Line
-	2500 2000 2050 2000
-Wire Wire Line
-	2050 1900 2400 1900
-Wire Wire Line
-	2300 1800 2050 1800
 Wire Wire Line
 	3800 6850 4350 6850
 Connection ~ 3800 6850
@@ -1358,4 +1173,207 @@ F 3 "~" H 4500 7250 50  0001 C CNN
 $EndComp
 Wire Wire Line
 	4650 7250 4950 7250
+$Comp
+L power:+5V #PWR011
+U 1 1 63C4584F
+P 4400 5550
+F 0 "#PWR011" H 4400 5400 50  0001 C CNN
+F 1 "+5V" H 4415 5723 50  0000 C CNN
+F 2 "" H 4400 5550 50  0001 C CNN
+F 3 "" H 4400 5550 50  0001 C CNN
+	1    4400 5550
+	-1   0    0    1   
+$EndComp
+$Comp
+L Device:R R5
+U 1 1 63C2645B
+P 4400 5400
+F 0 "R5" V 4607 5400 50  0000 C CNN
+F 1 "220" V 4516 5400 50  0000 C CNN
+F 2 "" V 4330 5400 50  0001 C CNN
+F 3 "~" H 4400 5400 50  0001 C CNN
+	1    4400 5400
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4200 2650 4200 900 
+Wire Wire Line
+	4100 2550 4100 1000
+Wire Wire Line
+	4000 2450 4000 1100
+Wire Wire Line
+	3900 2350 3900 1200
+Wire Wire Line
+	4000 2450 3800 2450
+Wire Wire Line
+	4100 2550 3800 2550
+Wire Wire Line
+	4200 2650 3800 2650
+Wire Wire Line
+	4650 2750 3800 2750
+Wire Wire Line
+	4500 2850 3800 2850
+$Comp
+L power:GND #PWR012
+U 1 1 63864BBE
+P 3300 1450
+F 0 "#PWR012" H 3300 1200 50  0001 C CNN
+F 1 "GND" H 3305 1277 50  0000 C CNN
+F 2 "" H 3300 1450 50  0001 C CNN
+F 3 "" H 3300 1450 50  0001 C CNN
+	1    3300 1450
+	-1   0    0    1   
+$EndComp
+$Comp
+L power:+5V #PWR010
+U 1 1 6389B431
+P 3100 3450
+F 0 "#PWR010" H 3100 3300 50  0001 C CNN
+F 1 "+5V" H 3115 3623 50  0000 C CNN
+F 2 "" H 3100 3450 50  0001 C CNN
+F 3 "" H 3100 3450 50  0001 C CNN
+	1    3100 3450
+	-1   0    0    1   
+$EndComp
+Wire Wire Line
+	3800 3050 4400 3050
+Wire Wire Line
+	3800 1750 5050 1750
+Wire Wire Line
+	3800 1950 5150 1950
+Wire Wire Line
+	3800 2050 4950 2050
+Wire Wire Line
+	3800 2150 4850 2150
+Wire Wire Line
+	4750 2250 3800 2250
+Wire Wire Line
+	3900 2350 3800 2350
+$Comp
+L MCU_Module:Arduino_Nano_v3.x A1
+U 1 1 63842D47
+P 3300 2450
+F 0 "A1" H 3800 3200 50  0000 C CNN
+F 1 "Arduino_Nano_v3.x" H 4100 3300 50  0000 C CNN
+F 2 "Module:Arduino_Nano" H 3300 2450 50  0001 C CIN
+F 3 "http://www.mouser.com/pdfdocs/Gravitech_Arduino_Nano3_0.pdf" H 3300 2450 50  0001 C CNN
+	1    3300 2450
+	-1   0    0    1   
+$EndComp
+Wire Wire Line
+	3900 1200 2600 1200
+Wire Wire Line
+	2600 1200 2600 2100
+Wire Wire Line
+	4000 1100 2500 1100
+Wire Wire Line
+	2500 1100 2500 2000
+Wire Wire Line
+	4100 1000 2400 1000
+Wire Wire Line
+	2400 1000 2400 1900
+Wire Wire Line
+	4200 900  2300 900 
+Wire Wire Line
+	2300 900  2300 1800
+$Comp
+L power:GND #PWR05
+U 1 1 63D66A4B
+P 2150 1600
+F 0 "#PWR05" H 2150 1350 50  0001 C CNN
+F 1 "GND" H 2155 1427 50  0000 C CNN
+F 2 "" H 2150 1600 50  0001 C CNN
+F 3 "" H 2150 1600 50  0001 C CNN
+	1    2150 1600
+	-1   0    0    1   
+$EndComp
+Wire Wire Line
+	2150 1700 2150 1600
+Wire Wire Line
+	2050 1700 2150 1700
+Wire Wire Line
+	2050 2100 2600 2100
+Wire Wire Line
+	2500 2000 2050 2000
+Wire Wire Line
+	2050 1900 2400 1900
+Wire Wire Line
+	2300 1800 2050 1800
+$Comp
+L Switch:SW_Coded_SH-7050 SW2
+U 1 1 63D4CF04
+P 1650 1900
+F 0 "SW2" H 1707 2367 50  0000 C CNN
+F 1 "MIDI Channel" H 1707 2276 50  0000 C CNN
+F 2 "" H 1350 1450 50  0001 L CNN
+F 3 "https://www.nidec-copal-electronics.com/e/catalog/switch/sh-7000.pdf" H 1650 1900 50  0001 C CNN
+	1    1650 1900
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2200 3850 2350 3850
+$Comp
+L power:GND #PWR04
+U 1 1 63D3A9A1
+P 2200 3850
+F 0 "#PWR04" H 2200 3600 50  0001 C CNN
+F 1 "GND" H 2205 3677 50  0000 C CNN
+F 2 "" H 2200 3850 50  0001 C CNN
+F 3 "" H 2200 3850 50  0001 C CNN
+	1    2200 3850
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	3100 3850 4500 3850
+Wire Wire Line
+	2650 3850 2800 3850
+$Comp
+L Device:R R3
+U 1 1 63D332C7
+P 2950 3850
+F 0 "R3" V 3157 3850 50  0000 C CNN
+F 1 "220" V 3066 3850 50  0000 C CNN
+F 2 "" V 2880 3850 50  0001 C CNN
+F 3 "~" H 2950 3850 50  0001 C CNN
+	1    2950 3850
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Device:LED D1
+U 1 1 63CFE04F
+P 2500 3850
+F 0 "D1" H 2493 4067 50  0000 C CNN
+F 1 "MIDI Act LED" H 2493 3976 50  0000 C CNN
+F 2 "" H 2500 3850 50  0001 C CNN
+F 3 "~" H 2500 3850 50  0001 C CNN
+	1    2500 3850
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4400 3050 4400 4300
+$Comp
+L dk_Rectangular-Connectors-Headers-Male-Pins:640456-2 J?
+U 1 1 63BAFF4E
+P 4300 4300
+F 0 "J?" V 4391 4172 50  0000 R CNN
+F 1 "MIDI Disable Jumper" V 4300 4172 50  0000 R CNN
+F 2 "digikey-footprints:PinHeader_1x2_P2.54mm_Drill1.02mm" H 4500 4500 60  0001 L CNN
+F 3 "https://www.te.com/commerce/DocumentDelivery/DDEController?Action=srchrtrv&DocNm=640456&DocType=Customer+Drawing&DocLang=English" H 4500 4600 60  0001 L CNN
+F 4 "A1921-ND" H 4500 4700 60  0001 L CNN "Digi-Key_PN"
+F 5 "640456-2" H 4500 4800 60  0001 L CNN "MPN"
+F 6 "Connectors, Interconnects" H 4500 4900 60  0001 L CNN "Category"
+F 7 "Rectangular Connectors - Headers, Male Pins" H 4500 5000 60  0001 L CNN "Family"
+F 8 "https://www.te.com/commerce/DocumentDelivery/DDEController?Action=srchrtrv&DocNm=640456&DocType=Customer+Drawing&DocLang=English" H 4500 5100 60  0001 L CNN "DK_Datasheet_Link"
+F 9 "/product-detail/en/te-connectivity-amp-connectors/640456-2/A1921-ND/109003" H 4500 5200 60  0001 L CNN "DK_Detail_Page"
+F 10 "CONN HEADER VERT 2POS 2.54MM" H 4500 5300 60  0001 L CNN "Description"
+F 11 "TE Connectivity AMP Connectors" H 4500 5400 60  0001 L CNN "Manufacturer"
+F 12 "Active" H 4500 5500 60  0001 L CNN "Status"
+	1    4300 4300
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	4400 4950 4400 5250
+Connection ~ 4400 4950
+Wire Wire Line
+	4400 4400 4400 4950
 $EndSCHEMATC
