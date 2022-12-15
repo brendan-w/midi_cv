@@ -16,26 +16,6 @@ $EndDescr
 $Comp
 L dk_Linear-Amplifiers-Instrumentation-OP-Amps-Buffer-Amps:TL084CN U5
 U 1 1 63843A91
-P 7700 1800
-F 0 "U5" H 7900 1650 60  0000 L CNN
-F 1 "TL084CN" H 7900 1550 60  0000 L CNN
-F 2 "digikey-footprints:DIP-14_W3mm" H 7900 2000 60  0001 L CNN
-F 3 "http://www.ti.com/general/docs/suppproductinfo.tsp?distId=10&gotoUrl=http%3A%2F%2Fwww.ti.com%2Flit%2Fgpn%2Ftl081a" H 7900 2100 60  0001 L CNN
-F 4 "296-1784-5-ND" H 7900 2200 60  0001 L CNN "Digi-Key_PN"
-F 5 "TL084CN" H 7900 2300 60  0001 L CNN "MPN"
-F 6 "Integrated Circuits (ICs)" H 7900 2400 60  0001 L CNN "Category"
-F 7 "Linear - Amplifiers - Instrumentation, OP Amps, Buffer Amps" H 7900 2500 60  0001 L CNN "Family"
-F 8 "http://www.ti.com/general/docs/suppproductinfo.tsp?distId=10&gotoUrl=http%3A%2F%2Fwww.ti.com%2Flit%2Fgpn%2Ftl081a" H 7900 2600 60  0001 L CNN "DK_Datasheet_Link"
-F 9 "/product-detail/en/texas-instruments/TL084CN/296-1784-5-ND/277429" H 7900 2700 60  0001 L CNN "DK_Detail_Page"
-F 10 "IC OPAMP JFET 4 CIRCUIT 14DIP" H 7900 2800 60  0001 L CNN "Description"
-F 11 "Texas Instruments" H 7900 2900 60  0001 L CNN "Manufacturer"
-F 12 "Active" H 7900 3000 60  0001 L CNN "Status"
-	1    7700 1800
-	1    0    0    -1  
-$EndComp
-$Comp
-L dk_Linear-Amplifiers-Instrumentation-OP-Amps-Buffer-Amps:TL084CN U5
-U 2 1 6384461A
 P 7700 3200
 F 0 "U5" H 7900 3050 60  0000 L CNN
 F 1 "TL084CN" H 7900 2950 60  0000 L CNN
@@ -50,12 +30,12 @@ F 9 "/product-detail/en/texas-instruments/TL084CN/296-1784-5-ND/277429" H 7900 4
 F 10 "IC OPAMP JFET 4 CIRCUIT 14DIP" H 7900 4200 60  0001 L CNN "Description"
 F 11 "Texas Instruments" H 7900 4300 60  0001 L CNN "Manufacturer"
 F 12 "Active" H 7900 4400 60  0001 L CNN "Status"
-	2    7700 3200
+	1    7700 3200
 	1    0    0    -1  
 $EndComp
 $Comp
 L dk_Linear-Amplifiers-Instrumentation-OP-Amps-Buffer-Amps:TL084CN U5
-U 3 1 6384541D
+U 2 1 6384461A
 P 7700 4550
 F 0 "U5" H 7900 4400 60  0000 L CNN
 F 1 "TL084CN" H 7900 4300 60  0000 L CNN
@@ -70,7 +50,27 @@ F 9 "/product-detail/en/texas-instruments/TL084CN/296-1784-5-ND/277429" H 7900 5
 F 10 "IC OPAMP JFET 4 CIRCUIT 14DIP" H 7900 5550 60  0001 L CNN "Description"
 F 11 "Texas Instruments" H 7900 5650 60  0001 L CNN "Manufacturer"
 F 12 "Active" H 7900 5750 60  0001 L CNN "Status"
-	3    7700 4550
+	2    7700 4550
+	1    0    0    -1  
+$EndComp
+$Comp
+L dk_Linear-Amplifiers-Instrumentation-OP-Amps-Buffer-Amps:TL084CN U5
+U 3 1 6384541D
+P 7700 1800
+F 0 "U5" H 7900 1650 60  0000 L CNN
+F 1 "TL084CN" H 7900 1550 60  0000 L CNN
+F 2 "digikey-footprints:DIP-14_W3mm" H 7900 2000 60  0001 L CNN
+F 3 "http://www.ti.com/general/docs/suppproductinfo.tsp?distId=10&gotoUrl=http%3A%2F%2Fwww.ti.com%2Flit%2Fgpn%2Ftl081a" H 7900 2100 60  0001 L CNN
+F 4 "296-1784-5-ND" H 7900 2200 60  0001 L CNN "Digi-Key_PN"
+F 5 "TL084CN" H 7900 2300 60  0001 L CNN "MPN"
+F 6 "Integrated Circuits (ICs)" H 7900 2400 60  0001 L CNN "Category"
+F 7 "Linear - Amplifiers - Instrumentation, OP Amps, Buffer Amps" H 7900 2500 60  0001 L CNN "Family"
+F 8 "http://www.ti.com/general/docs/suppproductinfo.tsp?distId=10&gotoUrl=http%3A%2F%2Fwww.ti.com%2Flit%2Fgpn%2Ftl081a" H 7900 2600 60  0001 L CNN "DK_Datasheet_Link"
+F 9 "/product-detail/en/texas-instruments/TL084CN/296-1784-5-ND/277429" H 7900 2700 60  0001 L CNN "DK_Detail_Page"
+F 10 "IC OPAMP JFET 4 CIRCUIT 14DIP" H 7900 2800 60  0001 L CNN "Description"
+F 11 "Texas Instruments" H 7900 2900 60  0001 L CNN "Manufacturer"
+F 12 "Active" H 7900 3000 60  0001 L CNN "Status"
+	3    7700 1800
 	1    0    0    -1  
 $EndComp
 $Comp
@@ -997,29 +997,16 @@ Text Label 5150 7050 0    50   ~ 0
 Text Notes 2800 850  0    50   ~ 0
 20k pull-up in Arduino
 $Comp
-L Device:R R7
-U 1 1 63C16740
-P 6800 1900
-F 0 "R7" V 6979 1848 50  0000 L CNN
-F 1 "22k" V 6888 1829 50  0000 L CNN
-F 2 "" V 6730 1900 50  0001 C CNN
-F 3 "~" H 6800 1900 50  0001 C CNN
-	1    6800 1900
-	0    -1   -1   0   
-$EndComp
-$Comp
 L Device:R R8
 U 1 1 63C20D15
 P 7100 1900
 F 0 "R8" V 7279 1848 50  0000 L CNN
-F 1 "2.2k" V 7193 1817 50  0000 L CNN
+F 1 "20k" V 7193 1817 50  0000 L CNN
 F 2 "" V 7030 1900 50  0001 C CNN
 F 3 "~" H 7100 1900 50  0001 C CNN
 	1    7100 1900
 	0    -1   -1   0   
 $EndComp
-Wire Wire Line
-	6450 1900 6650 1900
 Wire Wire Line
 	4950 2050 4950 2150
 Wire Wire Line
@@ -1376,4 +1363,6 @@ Wire Wire Line
 Connection ~ 4400 4950
 Wire Wire Line
 	4400 4400 4400 4950
+Wire Wire Line
+	6450 1900 6950 1900
 $EndSCHEMATC
