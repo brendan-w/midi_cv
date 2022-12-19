@@ -351,10 +351,13 @@ void setup() {
 
 
 void loop() {
+    now_ms = millis();
+    MIDI.read(midi_channel);  // Runs callbacks
+
 #if TEST_MODE
     static uint16_t ltc_value = 0;
     static uint16_t mcp_value = 0;
-    update_dacs(ltc_value, mcp_value, mcp_value);
+    update_dacs(65535, 1023, 1023);
     delay(10);
     ltc_value+=128;
     mcp_value+=2;
@@ -362,11 +365,10 @@ void loop() {
       mcp_value = 0;
     }
     digitalWrite(GATE, (mcp_value % 4 == 0) ? HIGH : LOW);
+    run_midi_act_led();
     return;
 #endif  // TEST_MODE
 
-    now_ms = millis();
-    MIDI.read(midi_channel);  // Runs callbacks
     if (!midi_notes.empty()) {
         update_dacs(compute_dac_pitch(midi_notes.back().note, midi_bend),  // LTC
                     compute_dac_breath(midi_breath),                       // MCP_A
