@@ -14,6 +14,12 @@ struct MidiNote {
     byte velocity;  // 0-127
 };
 
+// Piece-wise-linear control point
+struct PWLPoint {
+    uint16_t input;
+    uint16_t output;
+};
+
 // CONSTANTS
 
 // Pins
@@ -28,11 +34,20 @@ constexpr unsigned long MIDI_ACTIVITY_WINDOW_MS = 5;  // Length of time that the
 constexpr byte BREATH_CC = 2;
 constexpr byte MIN_MIDI_NOTE = 24;  // C1 == 32.70 Hz == 0 V
 constexpr byte MAX_MIDI_NOTE = 127;  // G9 == 12543.85 Hz == 8.583 V
-constexpr uint8_t BEND_SEMITONES = 2;
-
 // The hardware can only output a maximum of 10V, so the midi range above can only be 10 octaves wide
 static_assert(MIN_MIDI_NOTE < MAX_MIDI_NOTE);
 static_assert((MAX_MIDI_NOTE - MIN_MIDI_NOTE) <= 120);
+
+constexpr uint8_t BEND_SEMITONES = 2;
+const Array<PWLPoint, 2> BREATH_CURVE({
+    // Linearly interpolated control points of the form:
+    //   {input, output}
+    // with a possible value range of:
+    //   [0, 1023] (10-bits)
+    PWLPoint{0, 0},
+    PWLPoint{1023, 1023},
+});
+
 
 // STATES
 unsigned long now_ms = 0;
@@ -67,6 +82,11 @@ uint16_t seven_to_ten_bit(uint16_t value) {
     // Input bits:  [6, 5, 4, 3, 2, 1, 0]
     // Output bits: [6, 5, 4, 3, 2, 1, 0, 6, 5, 4]
     return (value << 3) | (value >> 4);
+}
+
+template<size_t MAX_SIZE>
+uint16_t apply_curve(uint16_t value, const Array<PWLPoint, MAX_SIZE>& curve) {
+    return 0;
 }
 
 // Safely subtracts two millis timestamps accounting for rollover
@@ -286,7 +306,7 @@ uint16_t compute_dac_pitch(byte note, int bend) {
 }
 
 uint16_t compute_dac_breath(byte breath) {
-    return seven_to_ten_bit(breath);
+    return apply_curve(seven_to_ten_bit(breath), BREATH_CURVE);
 }
 
 uint16_t compute_dac_velocity(byte velocity) {
