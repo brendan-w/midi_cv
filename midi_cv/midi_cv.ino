@@ -84,10 +84,12 @@ uint16_t seven_to_ten_bit(uint16_t value) {
     return (value << 3) | (value >> 4);
 }
 
+/*
 template<size_t MAX_SIZE>
 uint16_t apply_curve(uint16_t value, const Array<PWLPoint, MAX_SIZE>& curve) {
     return 0;
 }
+*/
 
 // Safely subtracts two millis timestamps accounting for rollover
 // Precondition: if the datatypes were infinitely wide: a >= b
@@ -306,7 +308,8 @@ uint16_t compute_dac_pitch(byte note, int bend) {
 }
 
 uint16_t compute_dac_breath(byte breath) {
-    return apply_curve(seven_to_ten_bit(breath), BREATH_CURVE);
+    return seven_to_ten_bit(breath);
+    // return apply_curve(seven_to_ten_bit(breath), BREATH_CURVE);
 }
 
 uint16_t compute_dac_velocity(byte velocity) {
