@@ -3,6 +3,7 @@
 
 #include "src/Array/src/Array.h"  // https://github.com/janelia-arduino/Array because I miss the STL too much
 #include "src/arduino_midi_library/src/MIDI.h"  // https://github.com/FortySevenEffects/arduino_midi_library
+#include "curve.h"
 
 #define TEST_MODE 0
 
@@ -12,12 +13,6 @@ MIDI_CREATE_DEFAULT_INSTANCE();
 struct MidiNote {
     byte note;
     byte velocity;  // 0-127
-};
-
-// Piece-wise-linear control point
-struct PWLPoint {
-    uint16_t input;
-    uint16_t output;
 };
 
 // CONSTANTS
@@ -84,13 +79,6 @@ uint16_t seven_to_ten_bit(uint16_t value) {
     return (value << 3) | (value >> 4);
 }
 
-/*
-template<size_t MAX_SIZE>
-uint16_t apply_curve(uint16_t value, const Array<PWLPoint, MAX_SIZE>& curve) {
-    return 0;
-}
-*/
-
 // Safely subtracts two millis timestamps accounting for rollover
 // Precondition: if the datatypes were infinitely wide: a >= b
 // Returns: a - b
@@ -120,7 +108,9 @@ void run_midi_act_led() {
 //
 
 // SPI protocol for the MCP4812 DAC. It has a 16-bit shift register that can update one of the two
-// outputs at a time, so updating both DACs takes two commands. Note that the members of this struct are upside-down compared to the datasheet. This is because the 
+// outputs at a time, so updating both DACs takes two commands. Note that the members of this struct
+// are upside-down compared to the datasheet. This is because of the combination of C bitfields and
+// the MSB-first setting on the SPI port.
 union MCP4812Command {
     struct Fields {
         uint8_t __:2;  // unused
@@ -308,8 +298,7 @@ uint16_t compute_dac_pitch(byte note, int bend) {
 }
 
 uint16_t compute_dac_breath(byte breath) {
-    return seven_to_ten_bit(breath);
-    // return apply_curve(seven_to_ten_bit(breath), BREATH_CURVE);
+    return apply_curve(seven_to_ten_bit(breath), BREATH_CURVE);
 }
 
 uint16_t compute_dac_velocity(byte velocity) {
