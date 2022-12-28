@@ -5,6 +5,7 @@
 #include "src/arduino_midi_library/src/MIDI.h"  // https://github.com/FortySevenEffects/arduino_midi_library
 #include "curve.h"
 
+// Outputs max values from all jacks. 10V from pitch, and 5V from velocity and breath
 #define TEST_MODE 0
 
 // Default instance is bound to the HW serial port
@@ -32,32 +33,55 @@ constexpr byte MAX_MIDI_NOTE = 127;  // G9 == 12543.85 Hz == 8.583 V
 // The hardware can only output a maximum of 10V, so the midi range above can only be 10 octaves wide
 static_assert(MIN_MIDI_NOTE < MAX_MIDI_NOTE);
 static_assert((MAX_MIDI_NOTE - MIN_MIDI_NOTE) <= 120);
-
 constexpr uint8_t BEND_SEMITONES = 2;
-const Array<PWLPoint, 2> BREATH_CURVE({
-    // Linearly interpolated control points of the form:
-    //   {input, output}
-    // with a possible value range of:
-    //   [0, 1023] (10-bits)
-    PWLPoint{0, 0},
-    PWLPoint{1023, 1023},
-});
-
 
 // STATES
 unsigned long now_ms = 0;
 unsigned long last_midi_ms = 0;
 
-// MIDI
+// Latest MIDI Inputs
 byte midi_channel = 1;  // 1-16
-byte midi_breath;  // 0-127
-int midi_bend;  // "bend" is centered at 0 by the MIDI library for us. Range is [-8192, 8191]
+byte midi_breath = 0;  // 0-127
+int midi_bend = 0;  // "bend" is centered at 0 by the MIDI library for us. Range is [-8192, 8191]
 Array<MidiNote, 10> midi_notes;
 
 
 //
 // Misc Utils
 //
+
+class MovingAverage {
+public:
+    MovingAverage(size_t window_size) : window_size_(window_size) {};
+    int operator()(int sample) {
+        avg_ += (sample - avg_) / window_size_;
+        return avg_;
+    }
+private:
+    int avg_ = 0;
+    const int window_size_ = 1;
+};
+
+class SlewDown {
+public:
+    // Higher devisor = longer/slower slew
+    SlewDown(size_t slew_divisor) : slew_divisor_(slew_divisor) {};
+    int operator()(int sample) {
+        if (sample < value_) {
+            // Note that we max(1, x) to protect against cases where either the
+            // slew_divisor_ is large, or the sample difference is small. Both
+            // cases are liable to produce an interval of zero.
+            value_ -= max(1, ((value_ - sample) / slew_divisor_));
+        } else {
+            // On up-slopes, this filter is transparent
+            value_ = sample;
+        }
+        return value_;
+    }
+private:
+    int value_;
+    const int slew_divisor_;
+};
 
 byte read_16_switch(const Array<int, 4> &pins) {
     byte value = 0;
@@ -144,23 +168,17 @@ void update_dacs(uint16_t ltc, uint16_t mcp_a, uint16_t mcp_b) {
 
     // NOTE: These structs are overwritten with input data by the SPI.transfer API,
     // so we prepare two of them rather than re-using one.
-    MCP4812Command command_a = {
-        fields: {
-            mcp_value: mcp_a,
-            mcp_output_shutdown: MCP4812Command::Fields::MCP_OUTPUT_ACTIVE,
-            mcp_gain_select: MCP4812Command::Fields::MCP_GAIN_2X,
-            mcp_ab_select: MCP4812Command::Fields::MCP_DAC_A,
-        }
-    };
+    MCP4812Command command_a = {};
+    command_a.fields.mcp_value = mcp_a;
+    command_a.fields.mcp_output_shutdown = MCP4812Command::Fields::MCP_OUTPUT_ACTIVE;
+    command_a.fields.mcp_gain_select = MCP4812Command::Fields::MCP_GAIN_2X;
+    command_a.fields.mcp_ab_select = MCP4812Command::Fields::MCP_DAC_A;
 
-    MCP4812Command command_b = {
-        fields: {
-            mcp_value: mcp_b,
-            mcp_output_shutdown: MCP4812Command::Fields::MCP_OUTPUT_ACTIVE,
-            mcp_gain_select: MCP4812Command::Fields::MCP_GAIN_2X,
-            mcp_ab_select: MCP4812Command::Fields::MCP_DAC_B,
-        }
-    };
+    MCP4812Command command_b = {};
+    command_b.fields.mcp_value = mcp_b;
+    command_b.fields.mcp_output_shutdown = MCP4812Command::Fields::MCP_OUTPUT_ACTIVE;
+    command_b.fields.mcp_gain_select = MCP4812Command::Fields::MCP_GAIN_2X;
+    command_b.fields.mcp_ab_select = MCP4812Command::Fields::MCP_DAC_B;
 
     // Slow down the SPI clock to <= 500khz
     SPISettings settings(2500000, MSBFIRST, SPI_MODE0);
@@ -194,6 +212,10 @@ void update_dacs(uint16_t ltc, uint16_t mcp_a, uint16_t mcp_b) {
 // Use the generic "all messages" callback to blink the activity LED. This will have the LED
 // responding to all messages on the channel, even ones that don't update the outputs.
 void handleMesssage(const decltype(MIDI)::MidiMessage& message) {
+    // Ignore active sensing messages, periodically sent every 300ms from the wind controller.
+    if (message.type == midi::ActiveSensing) {
+        return;
+    }
     blink_midi_act_led();
 }
 
@@ -201,6 +223,12 @@ void handleNoteOn(byte channel, byte note, byte velocity)
 {
     // Ingore notes that are out of range
     if ((note < MIN_MIDI_NOTE) || (note > MAX_MIDI_NOTE)) {
+        return;
+    }
+
+    if (velocity == 0) {
+        // NOTE ON with zero velocity is a NOTE OFF
+        handleNoteOff(channel, note, velocity);
         return;
     }
 
@@ -244,6 +272,12 @@ void handleNoteOff(byte channel, byte note, byte velocity) {
     }
 
     midi_notes.remove(found);
+
+    // If we're turning off gate, also turn off breath. Note that we do this by zeroing
+    // midi_breath, not dac_breath, since we want the smoothing to run on the downslope.
+    if (midi_notes.empty()) {
+        midi_breath = 0;
+    }
 }
 
 void handleControlChange(byte channel, byte control, byte value) {
@@ -279,15 +313,26 @@ uint16_t compute_dac_pitch(byte note, int bend) {
     // decimal carries (1/8 == 3 extra bits). This makes a semitone exactly 4369 wide.
     // This value is also larger than our semitone bend value of 4096, so 19-bits has
     // enough precision for both inputs.
+    note = constrain(note, MIN_MIDI_NOTE, MAX_MIDI_NOTE);
+    bend = constrain(bend, MIDI_PITCHBEND_MIN, MIDI_PITCHBEND_MAX);
 
     constexpr uint32_t SEMITONE = 4369;  // 546.125 DAC steps * 8
     constexpr uint32_t WIDE_PITCH_MAX = ((uint32_t(0b1) << 19) - 1);
     uint32_t wide_pitch = (note - MIN_MIDI_NOTE) * SEMITONE;  // 19-bits, range [0, 524287]
-    wide_pitch += map(bend,
-                      // from
-                      MIDI_PITCHBEND_MIN, MIDI_PITCHBEND_MAX,
-                      // to
-                      SEMITONE * -BEND_SEMITONES, SEMITONE * BEND_SEMITONES);
+    const int32_t wide_bend = map(bend,
+                                  // from
+                                  MIDI_PITCHBEND_MIN, MIDI_PITCHBEND_MAX,
+                                  // to
+                                  SEMITONE * -BEND_SEMITONES, SEMITONE * BEND_SEMITONES);
+    // wide_bend might be negative, so clamp pitch at zero to prevent underflow.
+    // Overflow is prevented simply because we're only using 19 bits of a
+    // 32 bit type, and we have a min() below.
+    if ((wide_bend < 0) && (abs(wide_bend) > wide_pitch)) {
+        wide_pitch = 0;
+    } else {
+        wide_pitch += wide_bend;
+    }
+
     // Round the value to the nearest 16-bit value for minimal error
     if ((wide_pitch & 0b111) > 3) {
         wide_pitch += 0b1000;
@@ -297,13 +342,63 @@ uint16_t compute_dac_pitch(byte note, int bend) {
     return wide_pitch >> 3;  // chop off the 3 LSB to range back into 16-bits for DAC output
 }
 
-uint16_t compute_dac_breath(byte breath) {
-    return apply_curve(seven_to_ten_bit(breath), BREATH_CURVE);
-}
-
 uint16_t compute_dac_velocity(byte velocity) {
     return seven_to_ten_bit(velocity);
 }
+
+// Breath handling
+
+// Constants used by this function
+constexpr unsigned long BREATH_SAMPLE_PERIOD_MS = 1;
+const Array<PWLPoint, 11> BREATH_CURVE({
+    // Linearly interpolated control points of the form:
+    //   {input, output}
+    // with a possible value range of:
+    //   [0, 1023] (10-bits)
+
+    // This curve was sampled from a VL1 synthesizer by issuing a linear ramp
+    // of breath CC's and observing the linear amplitude of the output.
+    PWLPoint{0, 0},
+    PWLPoint{8, 11},
+    PWLPoint{17, 64},
+    PWLPoint{25, 103},
+    PWLPoint{41, 174},
+    PWLPoint{73, 246},
+    PWLPoint{145, 342},
+    PWLPoint{323, 528},
+    PWLPoint{484, 656},
+    PWLPoint{709, 848},
+    PWLPoint{1023, 1023},
+});
+
+// States used by this function
+unsigned long last_breath_ms = 0;
+MovingAverage breath_smoothing(50 /* Window Size */);
+SlewDown slew_down(2 /* Slew Divisor */);
+
+// Note: unlike the other midi-to-DAC converter functions,
+// the one for breath must be called every loop for the filtering/smoothing to work.
+uint16_t compute_dac_breath(int breath) {
+    // Compute smoothed breath using a rolling average. Note that we advance the sliding window
+    // in the loop() function because the controller only sends CC2 on changes in the breath value,
+    // so we always insert the latest value.
+    if (subtract_millis(now_ms, last_breath_ms) < BREATH_SAMPLE_PERIOD_MS) {
+        return;
+    }
+    last_breath_ms = now_ms;
+
+    // Re-range from MIDI's [0,127] to the DACs [0,1023]
+    breath = seven_to_ten_bit(breath);
+    // Smooth out the fluttering noise. This is more effective when done before expanding to 10-bit
+    breath = breath_smoothing(breath);
+    // Apply sensitivity curve
+    breath = apply_curve(breath, BREATH_CURVE);
+    // Slew-down to prevent hard breath releases from popping
+    breath = slew_down(breath);
+
+    return breath;
+}
+
 
 //
 // Main Arduino API
@@ -338,34 +433,37 @@ void setup() {
     MIDI.begin(MIDI_CHANNEL_OMNI);
 }
 
+// Previous DAC output values (to persist outputs even when no note is pressed)
+uint16_t dac_pitch = 0;
+uint16_t dac_velocity = 0;
+uint16_t dac_breath = 0;
 
 void loop() {
     now_ms = millis();
     MIDI.read(midi_channel);  // Runs callbacks
 
 #if TEST_MODE
-    static uint16_t ltc_value = 0;
-    static uint16_t mcp_value = 0;
     update_dacs(65535, 1023, 1023);
+    digitalWrite(GATE, HIGH);
     delay(10);
-    ltc_value+=128;
-    mcp_value+=2;
-    if (mcp_value == 1024) {
-      mcp_value = 0;
-    }
-    digitalWrite(GATE, (mcp_value % 4 == 0) ? HIGH : LOW);
     run_midi_act_led();
     return;
 #endif  // TEST_MODE
 
+    // Always run breath computations, this has time-based smoothing in it.
+    dac_breath = compute_dac_breath(midi_breath);
+
+    // Run on-note-change computations
     if (!midi_notes.empty()) {
-        update_dacs(compute_dac_pitch(midi_notes.back().note, midi_bend),  // LTC
-                    compute_dac_breath(midi_breath),                       // MCP_A
-                    compute_dac_velocity(midi_notes.back().velocity));     // MCP_B
-        digitalWrite(GATE, HIGH);
-    } else {
-        digitalWrite(GATE, LOW);        
-        // Leave DAC outputs wherever they are
-    }
+        dac_pitch = compute_dac_pitch(midi_notes.back().note, midi_bend);
+        dac_velocity = compute_dac_velocity(midi_notes.back().velocity);
+    }  // else, leave DAC outputs wherever they are
+
+    update_dacs(dac_pitch,      // LTC
+                dac_breath,     // MCP_A
+                dac_velocity);  // MCP_B
+
+    digitalWrite(GATE, (midi_notes.empty() ? LOW : HIGH));
+
     run_midi_act_led();
 }
